@@ -18,12 +18,12 @@ public class GithubProvider implements RepositoryProvider {
 
     @Override
     public List<RepositoryInfo> getRepositoriesOf(String username, String token) {
-        return mapper.toRepositoryInfoList(client.getRepositoriesOf(username));
+        return mapper.toRepositoryInfoList(client.getRepositoriesOf("token " + token));
     }
 
     @Override
     public RepositoryInfo getRepository(String username, String repoName, String token) {
-        return mapper.toRepositoryInfo(client.getRepository(username, repoName));
+        return mapper.toRepositoryInfo(client.getRepository(username, repoName, "token " + token));
     }
 
 }

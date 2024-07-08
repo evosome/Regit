@@ -25,7 +25,7 @@ public class RepositoriesController {
     private List<RepositoryInfo> getRepositories(
             @PathVariable("provider") String provider,
             @PathVariable("user") String user,
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token
     ) throws RepositoryProviderNotFound {
         var repoProvider = locator.locate(provider);
         return repoProvider.getRepositoriesOf(user, token);
@@ -36,7 +36,7 @@ public class RepositoriesController {
             @PathVariable("name") String name,
             @PathVariable("provider") String provider,
             @PathVariable("user") String user,
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token
     ) throws RepositoryProviderNotFound {
         var repoProvider = locator.locate(provider);
         return repoProvider.getRepository(user, name, token);
