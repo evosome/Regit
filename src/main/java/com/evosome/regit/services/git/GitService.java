@@ -1,6 +1,6 @@
-package com.evosome.regit.services;
+package com.evosome.regit.services.git;
 
-import com.evosome.regit.properties.GitServiceProperties;
+import com.evosome.regit.services.git.properties.GitServiceProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;

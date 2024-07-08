@@ -4,7 +4,7 @@ server:
 logging:
   com.evosome.regit: DEBUG
 
-re-git:
+git-service:
   clone-path: /
 
 repo-providers:

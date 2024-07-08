@@ -1,10 +1,9 @@
 package com.evosome.regit.controllers;
 
-import com.evosome.regit.services.GitService;
+import com.evosome.regit.services.git.GitService;
 import com.evosome.regit.services.providers.RepositoryInfo;
 import com.evosome.regit.services.providers.RepositoryProvidersLocator;
 import com.evosome.regit.services.providers.exceptions.RepositoryProviderNotFound;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
