@@ -6,3 +6,9 @@ logging:
 
 re-git:
   clone-path: /
+
+repo-providers:
+  github:
+    apiUrl: https://api.github.com
+  bitbucket:
+    apiUrl: https://api.bitbucket.org/2.0
