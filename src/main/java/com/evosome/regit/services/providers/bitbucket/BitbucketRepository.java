@@ -12,14 +12,11 @@ class BitbucketRepository {
     @JsonProperty("full_name")
     private String fullName;
 
-    private String url;
-
     private String gitUrl;
 
     @JsonProperty("links")
     private void resolveNestedUrl(JsonNode links) {
-        url = links.get("html").get("href").asText();
-        gitUrl = links.get("clone").get("href").asText();
+        gitUrl = links.get("clone").get(0).get("href").asText();
     }
 
     @JsonProperty("is_private")

@@ -3,9 +3,11 @@ package com.evosome.regit.services.providers.bitbucket;
 import com.evosome.regit.services.providers.RepositoryInfo;
 import com.evosome.regit.services.providers.RepositoryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class BitbucketProvider implements RepositoryProvider {
 
     @Autowired
