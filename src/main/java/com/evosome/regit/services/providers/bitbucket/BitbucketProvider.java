@@ -18,12 +18,12 @@ public class BitbucketProvider implements RepositoryProvider {
 
     @Override
     public List<RepositoryInfo> getRepositoriesOf(String username, String token) {
-        return mapper.toRepositoryInfoList(client.getPagedRepositories(username).getRepositories());
+        return mapper.toRepositoryInfoList(client.getPagedRepositories(username, token).getRepositories());
     }
 
     @Override
     public RepositoryInfo getRepository(String username, String repoName, String token) {
-        return mapper.toRepositoryInfo(client.getRepository(username, repoName));
+        return mapper.toRepositoryInfo(client.getRepository(username, repoName, token));
     }
 
 }
