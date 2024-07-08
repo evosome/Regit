@@ -5,7 +5,7 @@ logging:
   com.evosome.regit: DEBUG
 
 git-service:
-  clone-path: /
+  clone-path: ${GIT_CLONE_PATH}
 
 repo-providers:
   github:

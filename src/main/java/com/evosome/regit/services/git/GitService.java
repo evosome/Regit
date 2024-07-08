@@ -1,38 +1,57 @@
 package com.evosome.regit.services.git;
 
+import com.evosome.regit.services.git.credentials.DefaultTokenCredentialFactory;
+import com.evosome.regit.services.git.credentials.TokenCredentialFactory;
 import com.evosome.regit.services.git.properties.GitServiceProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.transport.CredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import java.nio.file.Paths;
+import java.util.Map;
 
 @Slf4j
 @Service
 public class GitService {
 
-    private final GitServiceProperties props;
+    @Autowired
+    private GitServiceProperties props;
 
     @Autowired
-    public GitService(GitServiceProperties props) { this.props = props; }
+    @Qualifier("credentialFactories")
+    private Map<String, TokenCredentialFactory> factories;
+
+    public TokenCredentialFactory getTokenCredentialFactory(String gitService) {
+
+        if (!factories.containsKey(gitService))
+            return new DefaultTokenCredentialFactory();
+
+        return factories.get(gitService);
+    }
 
     /**
      * Clone repository in the specified path, using user's token.
+     * @param name Repository name
      * @param url Repository url to clone
-     * @param token User token
+     * @param credentials User credentials
      * @throws GitAPIException when git fails
      */
-    public void cloneRepositoryWithToken(String name, String url, String token) throws GitAPIException {
+    public void cloneRepositoryWithToken(
+            String name,
+            String url,
+            CredentialsProvider credentials
+    ) throws GitAPIException {
+
+        var path = Paths.get(props.getClonePath(), name);
         try(Git git = Git
                 .cloneRepository()
                 .setURI(url)
-                .setDirectory(
-                        new File(props.getClonePath() + "/" + name))
-                .setCredentialsProvider(
-                        new UsernamePasswordCredentialsProvider(token, ""))
+                .setDirectory(path.toFile())
+                .setCredentialsProvider(credentials)
                 .call()
         ) {
             log.info("Successfully cloned git repository {}", name);
