@@ -10,7 +10,7 @@ class GithubRepository {
     @JsonProperty("full_name")
     private String fullName;
 
-    @JsonProperty("git_url")
+    @JsonProperty("clone_url")
     private String gitUrl;
 
     @JsonProperty("private")

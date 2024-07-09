@@ -12,16 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/repos")
 public class RepositoriesController {
-
-    @Autowired
-    private GitService gitService;
 
     @Autowired
     private RepositoryProvidersLocator locator;
 
-    @GetMapping(value = "/repos/on/{provider}/of/{user}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/on/{provider}/of/{user}", produces = MediaType.APPLICATION_JSON_VALUE)
     private List<RepositoryInfo> getRepositories(
             @PathVariable("provider") String provider,
             @PathVariable("user") String user,
@@ -31,7 +28,7 @@ public class RepositoriesController {
         return repoProvider.getRepositoriesOf(user, token);
     }
 
-    @GetMapping(value = "/repos/{name}/on/{provider}/of/{user}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{name}/on/{provider}/of/{user}", produces = MediaType.APPLICATION_JSON_VALUE)
     private RepositoryInfo getRepository(
             @PathVariable("name") String name,
             @PathVariable("provider") String provider,
