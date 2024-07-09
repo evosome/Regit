@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
-@RequestMapping("/api/v1/clone")
-public class CloneController {
+@RequestMapping("/api/v1/sync")
+public class SyncController {
 
     @Autowired
     private GitService git;
@@ -19,12 +21,12 @@ public class CloneController {
     private RepositoryProvidersLocator locator;
 
     @PostMapping("{name}/from/{provider}/of/{user}")
-    private void cloneRepository(
+    private void syncRepository(
             @PathVariable("name") String name,
             @PathVariable("provider") String provider,
             @PathVariable("user") String user,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token
-    ) throws RepositoryProviderNotFound, GitAPIException {
+    ) throws RepositoryProviderNotFound, GitAPIException, IOException {
 
         var repoProvider = locator.locate(provider);
         var repository = repoProvider.getRepository(user, name, token);
@@ -34,7 +36,7 @@ public class CloneController {
                 .getTokenCredentialFactory(provider)
                 .getCredentialsProvider(user, token);
 
-        git.cloneRepositoryWithToken(name, cloneUrl, credentials);
+        git.syncRepository(cloneUrl, name, credentials);
     }
 
 }
