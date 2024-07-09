@@ -5,9 +5,9 @@ import com.evosome.regit.services.git.credentials.TokenCredentialFactory;
 import com.evosome.regit.services.git.properties.GitServiceProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.RepositoryCache;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.util.FS;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -69,6 +68,42 @@ public class GitService {
         }
     }
 
+    /**
+     * Upload repository to remote repos host.
+     * @param name Name of the repository, located in repos directory
+     * @param remoteUrl Remote URL to push the updates
+     * @param credentials User credentials
+     * @throws IOException When failed to open git repository
+     * @throws GitAPIException When git fails
+     */
+    public void uploadRepository(
+            String name,
+            String remoteUrl,
+            CredentialsProvider credentials
+    ) throws IOException, GitAPIException {
+
+        var path = Paths.get(props.getClonePath(), name);
+        var pathAsFile = path.toFile();
+
+        try(Git git = Git.open(pathAsFile)) {
+
+            var config = git.getRepository().getConfig();
+            var initialRemoteUrl = config.getString("remote", "origin", "url");
+
+            setRemoteOriginAndSave(config, remoteUrl);
+
+            git
+                    .push()
+                    .setPushAll()
+                    .setPushTags()
+                    .setCredentialsProvider(credentials)
+                    .call();
+
+            setRemoteOriginAndSave(config, initialRemoteUrl);
+
+        }
+    }
+
     private void clone(File path, String url, CredentialsProvider credentials) throws GitAPIException {
         try(Git git = Git
                 .cloneRepository()
@@ -95,5 +130,12 @@ public class GitService {
             log.info("Successfully pulled git repository {}", path);
         }
 
+    }
+
+    private static void setRemoteOriginAndSave(
+            StoredConfig config,
+            String value
+    ) {
+        config.setString("remote", "origin", "url", value);
     }
 }

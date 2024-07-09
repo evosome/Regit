@@ -1,9 +1,7 @@
 package com.evosome.regit.services.providers.github;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,4 +17,10 @@ interface GithubClient {
             @PathVariable("user") String username,
             @PathVariable("name") String name,
             @RequestHeader("Authorization") String token);
+
+    @PostMapping("/user/repos")
+    GithubRepository createRepository(
+            @RequestBody GithubRepositoryCreationInfo creationInfo,
+            @RequestHeader("Authorization") String token
+    );
 }

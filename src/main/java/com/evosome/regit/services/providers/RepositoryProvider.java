@@ -24,4 +24,37 @@ public interface RepositoryProvider {
      * @return user's repo
      */
     RepositoryInfo getRepository(String username, String repoName, String token);
+
+    /**
+     * Create repository on remote host.
+     * @param username User's name
+     * @param creationInfo Creating info
+     * @param token User's token
+     * @return Info about the created repository
+     */
+    RepositoryInfo createRepository(
+            String username,
+            RepositoryCreationInfo creationInfo,
+            String token);
+
+    /**
+     * Helper function to determine whether the repository exists on
+     * remote host.
+     * @param provider Repository provider
+     * @param username User's name
+     * @param repoName Repo's name
+     * @param token User's token
+     * @return Repository info or null, if not exists
+     */
+    static RepositoryInfo tryGetRepository(
+            RepositoryProvider provider,
+            String username,
+            String repoName,
+            String token) {
+        try {
+            return provider.getRepository(username, repoName, token);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
 }
