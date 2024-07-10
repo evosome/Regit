@@ -29,7 +29,14 @@ public class BitbucketProvider implements RepositoryProvider {
 
     @Override
     public RepositoryInfo createRepository(String username, RepositoryCreationInfo creationInfo, String token) {
-        return null;
+        return mapper.toRepositoryInfo(
+                client.createRepository(
+                        username,
+                        creationInfo.getName().toLowerCase(),
+                        token,
+                        new BitbucketRepositoryCreationInfo("git", creationInfo.isPrivate())
+                )
+        );
     }
 
 }
