@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -38,6 +39,11 @@ public class GitService {
         return factories.get(gitService);
     }
 
+    public boolean repositoryExists(String name) {
+        var fullPath = Paths.get(props.getClonePath(), name);
+        return RepositoryCache.FileKey.isGitRepository(fullPath.toFile(), FS.DETECTED);
+    }
+
     /**
      * Sync (clone or update already existing repo) repository in the specified path, using user's token.
      * If directory exists on the specified path and directory is a git repo, try to update it.
@@ -58,7 +64,7 @@ public class GitService {
         var gitPathAsFile = new File(pathAsFile, ".git");
 
         // if repository exists, update it.
-        if (RepositoryCache.FileKey.isGitRepository(gitPathAsFile, FS.DETECTED)) {
+        if (repositoryExists(name)) {
             pull(pathAsFile, credentials);
         }
         // otherwise try to clone into the following path. If path already exists, and it's not a git repo,
