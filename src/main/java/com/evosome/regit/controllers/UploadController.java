@@ -5,13 +5,23 @@ import com.evosome.regit.services.providers.RepositoryCreationInfo;
 import com.evosome.regit.services.providers.RepositoryProvider;
 import com.evosome.regit.services.providers.RepositoryProvidersLocator;
 import com.evosome.regit.services.providers.exceptions.RepositoryProviderNotFound;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+@Tag(
+        name = "Upload controller",
+        description =
+                "Upload local repository to remote host"
+)
 @RestController
 @RequestMapping("/api/v1/upload")
 public class UploadController {
@@ -22,19 +32,43 @@ public class UploadController {
     @Autowired
     private RepositoryProvidersLocator locator;
 
+    @Operation(
+            summary = "Upload repository",
+            description =
+                    "Synchronize local repo or clone new from remote host",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully updated remote repository"
+                    ),
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Successfully created remote repository and uploaded"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "User not authorized, as his token either expired or not valid"
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Server-side exception happened. Basically, git exceptions happens"
+                    )
+            }
+    )
     @PostMapping("{name}/to/{provider}/of/{user}")
-    private void syncRepository(
+    private ResponseEntity<?> syncRepository(
             @PathVariable("name") String name,
             @PathVariable("provider") String provider,
             @PathVariable("user") String user,
             @RequestParam(value = "private", defaultValue = "false") boolean isPrivate,
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token
+            @RequestHeader("X-Auth-Token") String token
     ) throws RepositoryProviderNotFound, GitAPIException, IOException {
 
         var repoProvider = locator.locate(provider);
         var repository = RepositoryProvider.tryGetRepository(repoProvider, user, name, token);
+        var wasNotCreated = repository == null;
 
-        if (repository == null)
+        if (wasNotCreated)
             repository = repoProvider.createRepository(
                     user,
                     RepositoryCreationInfo
@@ -52,6 +86,12 @@ public class UploadController {
                 .getCredentialsProvider(user, token);
 
         git.uploadRepository(name, gitUrl, credentials);
+
+        return new ResponseEntity<>(
+                wasNotCreated
+                        ? HttpStatus.CREATED
+                        : HttpStatus.OK
+        );
     }
 
 }
